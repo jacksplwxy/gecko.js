@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+	<head>
+		<title></title>
+		<meta charset="utf-8">
+		<style>
+			#parent{
+				width:800px;
+				height:400px;
+				border:1px solid #000;
+				padding:10px;
+				/*假定 人眼 到投射平面的距离*/
+				-webkit-perspective:1000px;
+			}
+			#container{
+				width:800px;
+				height:400px;
+				border:1px solid #999;
+				position:relative;
+				/*旋转*/
+				transform:rotatex(-30deg) rotatey(0deg);
+				/*将当前元素变为3d元素*/
+				transform-style:preserve-3d;
+				transition:transform 60s linear;
+			}
+			#container div{
+				width:100px;
+				height:100px;
+				background:#E4393C;
+				position:absolute;
+				left:350px;
+				top:150px;
+			}
+			#container div:nth-child(1){
+				transform:rotatey(0deg) translatez(200px);
+			}
+			#container div:nth-child(2){
+				transform:rotatey(60deg) translatez(200px);
+			}
+			#container div:nth-child(3){
+				transform:rotatey(120deg) translatez(200px);
+			}
+			#container div:nth-child(4){
+				transform:rotatey(180deg) translatez(200px);
+			}
+			#container div:nth-child(5){
+				transform:rotatey(240deg) translatez(200px);
+			}
+			#container div:nth-child(6){
+				transform:rotatey(300deg) translatez(200px);
+			}
+			#parent:hover #container{
+				transform:rotatex(-30deg) rotatey(3600deg);
+			}
+
+		</style>
+	</head>
+	<body>
+		<div id="parent">
+			<div id="container">
+				<div>1</div>
+				<div>2</div>
+				<div>3</div>
+				<div>4</div>
+				<div>5</div>
+				<div>6</div>
+			</div>
+		</div>
+	</body>
+</html>

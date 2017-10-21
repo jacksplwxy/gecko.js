@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title></title>
+	<meta charset="utf-8" />
+	<style></style>
+
+</head>
+<style>
+	#test {
+		width: 100px;
+		height: 100px;
+		background: goldenrod;
+		position: relative;
+	}
+</style>
+
+<body>
+	<div id='test'>123</div>
+	<script src="gecko.js"></script>
+	<script type="text/javascript">
+		alert($('#test').text())
+		$('#test').animate(this,{
+			left: '233px'
+		}, 1000, function () {
+			alert("Finished!");
+		})
+	</script>
+</body>
+
+</html>
