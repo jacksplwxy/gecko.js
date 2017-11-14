@@ -1,4 +1,4 @@
-﻿/*作者：jacksplwxy*/
+/*作者：jacksplwxy*/
 /*类库兼容情况：IE9及以上*/
 /*包含内容：选择器、DOM操作、样式操作、事件操作、动画、ajax、cookies*/
 /*写类库目的：
@@ -243,7 +243,7 @@
     /***************定义实例方法start*******************/
     gecko.prototype.html = function (content) { //获取标签html(含tag和text)
         var that = this
-        var htmlHook = { //采用钩子机制替换if else，逼格高，效率快，易扩展
+        var htmlHook = { //采用钩子机制替换if else，效率快，易扩展
             0: function () {
                 return that[0].innerHTML
             },
@@ -251,7 +251,7 @@
                 each(that, function (i, item) {
                     item.innerHTML = content
                 })
-                return that;
+                return that;    //将gecko实例返回回去，实现链式调用
             }
         }
         return htmlHook[arguments.length]();
@@ -267,7 +267,7 @@
                 each(that, function (i, item) {
                     item.textContent = content
                 })
-                return that;
+                return that;    //将gecko实例返回回去，实现链式调用
             }
         }
         return textHook[arguments.length]();
@@ -283,7 +283,7 @@
                 each(that, function (i, item) {
                     item.setAttribute("value", value);
                 })
-                return that;
+                return that;    //将gecko实例返回回去，实现链式调用
             }
         }
         return valHook[arguments.length]();
@@ -303,7 +303,7 @@
                      中括号运算符可以用js的关键字和保留字作为属性名。点运算符不能。*/
                     item[name] = value; //这里不能用item.name，否则name会被当成一个键名写到attribute中
                 })
-                return that;
+                return that;    //将gecko实例返回回去，实现链式调用
             }
         }
         return propHook[arguments.length]();
@@ -311,7 +311,7 @@
 
     gecko.prototype.attr = function (name, value) { //prop是设置property，attr设置attribute
         var that = this
-        var attrHook = { //采用钩子机制替换if else，逼格高，效率快，易扩展
+        var attrHook = { //采用钩子机制替换if else，效率快，易扩展
             1: function () {
                 return that[0].getAttribute(name)
             },
@@ -319,12 +319,13 @@
                 each(that, function (i, item) {
                     item.setAttribute(name, value);
                 })
-                return that;
+                return that;    //将gecko实例返回回去，实现链式调用
             }
         }
         return attrHook[arguments.length]();
     }
 
+    /* 动画开始 */
     gecko.prototype.animate = function animate(obj, css, interval, speedFactor, func) {
         clearInterval(obj.timer);
 
@@ -359,6 +360,21 @@
             }
         }, interval);
     }
+    /* 动画结束 */
+
+    /* 事件开始 */
+    //并非所有的事件都能冒泡，如load, change, submit, focus, blur
+    //boolean=false，ES6语法，设置参数的默认值
+    /*gecko.prototype.on = function (type, posteritySelector, handler, boolean = false) {
+        const that = this[0];
+        //let type = 'on' + type;
+        console.log('that', that)
+        let posterity = that.querySelectorAll(posteritySelector);
+        console.log('posterity', posterity[0])
+        //bind将handler中this指向posterity，bind与call不同，不会直接执行
+        that.addEventListener(type, handler.bind(posterity[0]), boolean)
+    }*/
+    /* 事件结束 */
 
     /***************定义实例方法end*******************/
 
