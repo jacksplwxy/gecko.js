@@ -365,15 +365,34 @@
     /* 事件开始 */
     //并非所有的事件都能冒泡，如load, change, submit, focus, blur
     //boolean=false，ES6语法，设置参数的默认值
-    /*gecko.prototype.on = function (type, posteritySelector, handler, boolean = false) {
-        const that = this[0];
-        //let type = 'on' + type;
-        console.log('that', that)
-        let posterity = that.querySelectorAll(posteritySelector);
-        console.log('posterity', posterity[0])
-        //bind将handler中this指向posterity，bind与call不同，不会直接执行
-        that.addEventListener(type, handler.bind(posterity[0]), boolean)
-    }*/
+    gecko.prototype.on = function (type, posteritySelector, handler, boolean = false) {
+        if (typeof posteritySelector !== "string") {
+            posteritySelector = undefined;
+            console.log(this[0])
+            console.log(type)
+            console.log(handler)
+            console.log(boolean)
+            this[0].addEventListener(type, handler, boolean)
+        } else {
+            //此处委托代码的实现经验：难度主要是将回调handler进行包装处理。步骤是先用实例模拟，再将小功能一步一步实现，最后再抽象出来
+            let newHandler = () => {
+                let thisName = this[0].querySelectorAll(posteritySelector)[0].nodeName;
+                let getNode = function (node) {
+                    if (node.nodeName === thisName) {
+                        return node;
+                    } else {
+                        return getNode(node.parentNode); //迭代实现循环匹配节点名称
+                    }
+                }
+                handler.call(getNode(e.target))
+            }
+            console.log('222', this[0])
+            console.log('222', type)
+            console.log('222', newHandler)
+            console.log('222', boolean)
+            this[0].addEventListener(type, newHandler, boolean)
+        }
+    }
     /* 事件结束 */
 
     /***************定义实例方法end*******************/

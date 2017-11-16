@@ -14,18 +14,53 @@
 		background: goldenrod;
 		position: relative;
 	}
+
+	p {
+		background: greenyellow;
+	}
+
+	div {
+		background: rebeccapurple;
+	}
 </style>
 
 <body>
-	<div id='test'>123</div>
+	<div id='test' class="wocao">
+		<ul>
+			aaa
+			<li>
+				bbbb
+				<p>ccc</p>
+			</li>
+		</ul>
+		<p>
+			ddd
+			<div>
+				eee
+				<p>fff</p>
+			</div>
+		</p>
+		<p>
+			ggg
+			<div>
+				hhh
+				<p>iii</p>
+			</div>
+		</p>
+	</div>
+	<!-- <script src="jquery-1.11.3.js"></script> -->
 	<script src="gecko.js"></script>
 	<script type="text/javascript">
-		alert($('#test').text())
-		$('#test').animate(this,{
-			left: '233px'
-		}, 1000, function () {
-			alert("Finished!");
+		$("#test")[0].addEventListener('click', function (e) {
+			e.target.style.color = 'red'
 		})
+		$("#test").on('click', 'p', function (e) {
+			e.target.style.color = 'blue'
+		})
+		// $("#test").on('click', function (e) {
+		// 	// $(e.target).css('color', 'red')
+		// 	e.target.style.color = 'red'
+		// })
 	</script>
 </body>
 
