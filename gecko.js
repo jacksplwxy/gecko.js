@@ -134,7 +134,7 @@
     /***************定义内部方法end*******************/
 
     /***************定义类方法start*******************/
-    gecko.each = each;
+    gecko.each = each;  //暴露each
 
     //用钩子机制精确数据类型:
     //钩子机制（hook）:就是策略模式，是用字典匹配，取代if判断，提升效率和可拓展性
@@ -386,7 +386,7 @@
                         return node;
                     } else {
                         if (node.parentNode) { //判断是不是点在thisName的祖宗节点上
-                            return getNode(node.parentNode); //迭代实现循环匹配节点名称
+                            return getNode(node.parentNode); //迭代实现向上循环匹配节点名称,直到找到正确的节点名称
                         } else {
                             return null
                         }
