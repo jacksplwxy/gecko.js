@@ -28,20 +28,27 @@
     //gecko.prototype={};  //原型不要再定义为对象，因为原型自带constructor属性，该属性指向原型的构造对象。如果乱定义prototype，将丢失constructor，将导致实例对象找不到真正的构造函数
     //默认：gecko.prototype.constructor===gecko
     gecko.prototype.init = function (selector) {
-        var firstCode = selector.charAt(0),
-            arr = [];
-        if (firstCode === '#') {
-            //call与apply仅参数形式不一样
-            arr.push.call(arr, document.getElementById(selector.slice(1)))
-        } else if (firstCode === '.') {
-            //document.getElementsByClassName( selector.slice( 1 ) )实际是HTMLCollection的类数组，而apply将类数组一个个添加到arr中，变成了数组
-            arr.push.apply(arr, document.getElementsByClassName(selector.slice(1)))
+        //instanceof运算符用来判断一个构造函数的prototype属性所指向的对象是否存在另外一个要检测对象的原型链上
+        if (selector instanceof HTMLElement) { //说明selector是个标准的DOM元素，无需再进行选择器选择
+            var arr = [];
+            arr.push(selector)
+        } else if (selector instanceof HTMLCollection) { //有种情况是选择器选取了多个元素，这时的原型为HTMLCollection而不是HTMLElement
+            var arr = selector;
         } else {
-            arr.push.apply(arr, document.getElementsByTagName(selector));
-        }
-        //当前面选择器无法获取数据时，调用querySlectorAll,这个选择器的速度较慢(参考V8引擎源码)
-        if (!arr[0]) {
-            arr.push.apply(arr, document.querySelectorAll(selector));
+            var firstCode = selector.charAt(0),
+                arr = [];
+            if (firstCode === '#') {
+                arr.push(document.getElementById(selector.slice(1)))
+            } else if (firstCode === '.') {
+                //document.getElementsByClassName( selector.slice( 1 ) )实际是HTMLCollection的类数组，而apply将类数组一个个添加到arr中，变成了数组
+                arr.push.apply(arr, document.getElementsByClassName(selector.slice(1)))
+            } else {
+                arr.push.apply(arr, document.getElementsByTagName(selector));
+            }
+            //当前面选择器无法获取数据时，调用querySlectorAll,这个选择器的速度较慢(参考V8引擎源码分析)
+            if (!arr[0]) {
+                arr.push.apply(arr, document.querySelectorAll(selector));
+            }
         }
         //this指向原型对象(gecko.prototype)，这样var gecko(实例对象)可以直接使用prototype中的方法，而不需要通过prototype(gecko.prototype.方法)
         for (var i = 0, len = arr.length; i < len; i++) {
@@ -251,7 +258,7 @@
                 each(that, function (i, item) {
                     item.innerHTML = content
                 })
-                return that;    //将gecko实例返回回去，实现链式调用
+                return that; //将gecko实例返回回去，实现链式调用
             }
         }
         return htmlHook[arguments.length]();
@@ -267,7 +274,7 @@
                 each(that, function (i, item) {
                     item.textContent = content
                 })
-                return that;    //将gecko实例返回回去，实现链式调用
+                return that; //将gecko实例返回回去，实现链式调用
             }
         }
         return textHook[arguments.length]();
@@ -283,7 +290,7 @@
                 each(that, function (i, item) {
                     item.setAttribute("value", value);
                 })
-                return that;    //将gecko实例返回回去，实现链式调用
+                return that; //将gecko实例返回回去，实现链式调用
             }
         }
         return valHook[arguments.length]();
@@ -303,7 +310,7 @@
                      中括号运算符可以用js的关键字和保留字作为属性名。点运算符不能。*/
                     item[name] = value; //这里不能用item.name，否则name会被当成一个键名写到attribute中
                 })
-                return that;    //将gecko实例返回回去，实现链式调用
+                return that; //将gecko实例返回回去，实现链式调用
             }
         }
         return propHook[arguments.length]();
@@ -319,14 +326,14 @@
                 each(that, function (i, item) {
                     item.setAttribute(name, value);
                 })
-                return that;    //将gecko实例返回回去，实现链式调用
+                return that; //将gecko实例返回回去，实现链式调用
             }
         }
         return attrHook[arguments.length]();
     }
 
     /* 动画开始 */
-    gecko.prototype.animate = function animate(obj, css, interval, speedFactor, func) {
+    /*gecko.prototype.animate = function animate(obj, css, interval, speedFactor, func) {
         clearInterval(obj.timer);
 
         function getCss(obj, prop) {
@@ -359,37 +366,41 @@
                     func();
             }
         }, interval);
-    }
+    }*/
     /* 动画结束 */
 
+    
     /* 事件开始 */
+    //只实现on的常用功能:事件委托
     //并非所有的事件都能冒泡，如load, change, submit, focus, blur
     //boolean=false，ES6语法，设置参数的默认值
     gecko.prototype.on = function (type, posteritySelector, handler, boolean = false) {
         if (typeof posteritySelector !== "string") {
-            posteritySelector = undefined;
-            console.log(this[0])
-            console.log(type)
-            console.log(handler)
-            console.log(boolean)
-            this[0].addEventListener(type, handler, boolean)
+            this[0].addEventListener(arguments[0], arguments[1], arguments[2])
         } else {
             //此处委托代码的实现经验：难度主要是将回调handler进行包装处理。步骤是先用实例模拟，再将小功能一步一步实现，最后再抽象出来
-            let newHandler = () => {
+            let newHandler = (() => {
                 let thisName = this[0].querySelectorAll(posteritySelector)[0].nodeName;
-                let getNode = function (node) {
+                let getNode = (node) => {
                     if (node.nodeName === thisName) {
                         return node;
                     } else {
-                        return getNode(node.parentNode); //迭代实现循环匹配节点名称
+                        if (node.parentNode) { //判断是不是点在thisName的祖宗节点上
+                            return getNode(node.parentNode); //迭代实现循环匹配节点名称
+                        } else {
+                            return null
+                        }
                     }
                 }
-                handler.call(getNode(e.target))
-            }
-            console.log('222', this[0])
-            console.log('222', type)
-            console.log('222', newHandler)
-            console.log('222', boolean)
+                return (e) => {
+                    let that = getNode(e.target)
+                    if (that) { //因为如果点到thisName的祖宗节点上，that将为Null，操作没有节点属性的null将在控制台报错
+                        handler.call(that, e) //将handler里的this指向点击的那个node
+                    } else { 
+                        return false;
+                    }
+                }
+            })()
             this[0].addEventListener(type, newHandler, boolean)
         }
     }

@@ -33,34 +33,22 @@
 				<p>ccc</p>
 			</li>
 		</ul>
-		<p>
+		<ul>
 			ddd
-			<div>
+			<li>
 				eee
 				<p>fff</p>
-			</div>
-		</p>
-		<p>
-			ggg
-			<div>
-				hhh
-				<p>iii</p>
-			</div>
-		</p>
+			</li>
+		</ul>
+	
 	</div>
 	<!-- <script src="jquery-1.11.3.js"></script> -->
 	<script src="gecko.js"></script>
 	<script type="text/javascript">
-		$("#test")[0].addEventListener('click', function (e) {
-			e.target.style.color = 'red'
+		$("#test").on('click', 'li',function (e) {
+			console.log(this)
+			console.log($(this).text())
 		})
-		$("#test").on('click', 'p', function (e) {
-			e.target.style.color = 'blue'
-		})
-		// $("#test").on('click', function (e) {
-		// 	// $(e.target).css('color', 'red')
-		// 	e.target.style.color = 'red'
-		// })
 	</script>
 </body>
 
