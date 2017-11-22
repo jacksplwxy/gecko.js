@@ -29,7 +29,7 @@
     //默认：gecko.prototype.constructor===gecko
     gecko.prototype.init = function (selector) {
         //instanceof运算符用来判断一个构造函数的prototype属性所指向的对象是否存在另外一个要检测对象的原型链上
-        if (selector instanceof HTMLElement) { //说明selector是个标准的DOM元素，无需再进行选择器选择
+        if (selector instanceof HTMLElement) { //说明selector是个标准的DOM元素，无需再进行选择器选择，只需继承gecko的类和实例方法即可
             var arr = [];
             arr.push(selector)
         } else if (selector instanceof HTMLCollection) { //有种情况是选择器选取了多个元素，这时的原型为HTMLCollection而不是HTMLElement
@@ -332,43 +332,6 @@
         return attrHook[arguments.length]();
     }
 
-    /* 动画开始 */
-    /*gecko.prototype.animate = function animate(obj, css, interval, speedFactor, func) {
-        clearInterval(obj.timer);
-
-        function getCss(obj, prop) {
-            if (obj.currentStyle)
-                return obj.currentStyle[prop]; // ie 
-            else
-                return document.defaultView.getComputedStyle(obj, null)[prop]; // 非ie 
-        }
-        obj.timer = setInterval(function () {
-            var flag = true;
-            for (var prop in css) {
-                var cur = 0;
-                if (prop == "opacity")
-                    cur = Math.round(parseFloat(getStyle(obj, prop)) * 100);
-                else
-                    cur = parseInt(getStyle(obj, prop));
-                var speed = (css[prop] - cur) * speedFactor;
-                speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
-                if (cur != css[prop])
-                    flag = false;
-                if (prop == "opacity") {
-                    obj.style.filter = "alpha(opacity : '+(cur + speed)+' )";
-                    obj.style.opacity = (cur + speed) / 100;
-                } else
-                    obj.style[prop] = cur + speed + "px";
-            }
-            if (flag) {
-                clearInterval(obj.timer);
-                if (func)
-                    func();
-            }
-        }, interval);
-    }*/
-    /* 动画结束 */
-
     
     /* 事件开始 */
     //只实现on的常用功能:事件委托
@@ -405,6 +368,43 @@
         }
     }
     /* 事件结束 */
+
+        /* 动画开始 */
+    /*gecko.prototype.animate = function animate(obj, css, interval, speedFactor, func) {
+        clearInterval(obj.timer);
+
+        function getCss(obj, prop) {
+            if (obj.currentStyle)
+                return obj.currentStyle[prop]; // ie 
+            else
+                return document.defaultView.getComputedStyle(obj, null)[prop]; // 非ie 
+        }
+        obj.timer = setInterval(function () {
+            var flag = true;
+            for (var prop in css) {
+                var cur = 0;
+                if (prop == "opacity")
+                    cur = Math.round(parseFloat(getStyle(obj, prop)) * 100);
+                else
+                    cur = parseInt(getStyle(obj, prop));
+                var speed = (css[prop] - cur) * speedFactor;
+                speed = speed > 0 ? Math.ceil(speed) : Math.floor(speed);
+                if (cur != css[prop])
+                    flag = false;
+                if (prop == "opacity") {
+                    obj.style.filter = "alpha(opacity : '+(cur + speed)+' )";
+                    obj.style.opacity = (cur + speed) / 100;
+                } else
+                    obj.style[prop] = cur + speed + "px";
+            }
+            if (flag) {
+                clearInterval(obj.timer);
+                if (func)
+                    func();
+            }
+        }, interval);
+    }*/
+    /* 动画结束 */
 
     /***************定义实例方法end*******************/
 

@@ -1,2 +1,0 @@
-jQuery源码解析（5）—— Animation动画：http://blog.csdn.net/vbdfforever/article/details/51121012
-浅谈原生JS实现jQuery的animate()动画示例：http://www.jb51.net/article/107757.htm
