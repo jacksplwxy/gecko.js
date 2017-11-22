@@ -2,19 +2,16 @@
 /*类库兼容情况：IE9及以上*/
 /*包含内容：选择器、DOM操作、样式操作、事件操作、动画、ajax、cookies*/
 /*写类库目的：
- ·学习： 写类库能更好的学习原生JS语法、 浏览器DOM、 JS效率等方面的知识
- ·JQ太大：我们很多时候只用到它的选择器等少数功能
- ·原生JS麻烦,都是超长api：满屏的document.getElenment.....
- ·性能低：JQ本质是包装DOM对象的类，JQ功能多对象大，兼容的问题多，各种包含原生JS的判断和语法糖
+ ·学习： 写类库能更好的学习原生语法、 DOM、 效率等方面的知识
  ·分享：有需要的人可以使用和学习制作类库，尽量注释完整
+ ·JQ太大：我们很多时候只用到它的选择器等少数功能，而jquery大部分代码在出来兼容和格式化参数
+ ·原生JS麻烦,都是超长api：满屏的document.getElenment.....
  */
 /*参考资料：
 ·慕课网JQ源码学习：http://www.imooc.com/learn/222
-·网易云课堂：http://study.163.com/course/courseMain.htm?courseId=465001
 */
 
 "use strict"; //使用严格模式
-
 //一个匿名自调函数，目的是不污染全局作用域，只暴露 $ 和 gecko 这 2 个变量给全局
 //参数undefined是防止老IE下的关键词undefined被当变量覆盖
 (function (window, undefined) {
