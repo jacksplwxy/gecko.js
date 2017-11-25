@@ -1,7 +1,7 @@
 /*作者：jacksplwxy*/
 /*类库兼容情况：IE9及以上*/
 /*包含内容：选择器、DOM操作、样式操作、事件操作、动画、ajax、cookies*/
-/*写类库目的：
+/*目的：
  ·学习： 写类库能更好的学习原生语法、 DOM、 效率等方面的知识
  ·分享：有需要的人可以使用和学习制作类库，尽量注释完整
  ·JQ太大：我们很多时候只用到它的选择器等少数功能，而jquery大部分代码在出来兼容和格式化参数
@@ -12,7 +12,7 @@
 */
 
 "use strict"; //使用严格模式
-//一个匿名自调函数，目的是不污染全局作用域，只暴露 $ 和 gecko 这 2 个变量给全局
+//一个匿名自调函数，目的是不污染全局作用域或被污染，只暴露 $ 和 gecko 这 2 个变量给全局
 //参数undefined是防止老IE下的关键词undefined被当变量覆盖
 (function (window, undefined) {
 
@@ -133,7 +133,8 @@
     /***************定义类方法start*******************/
     gecko.each = each;  //暴露each
 
-    //用钩子机制精确数据类型:
+    //----------------------------type start----------------------------//
+    //类方法：tyope函数:用于定义对象的精确类型
     //钩子机制（hook）:就是策略模式，是用字典匹配，取代if判断，提升效率和可拓展性
     //原生的 typeof 方法并不能区分出一个变量它是 Array 、RegExp 等 object 类型，gecko为了扩展 typeof 的表达力，因此有了 type 方法
     //运用了钩子机制，判断类型前，将常见类型打表，先存于一个 Hash 表 typeTable 里边
@@ -151,7 +152,9 @@
             typeTable[Object.prototype.toString.call(obj)] || "object" :
             typeof obj;
     }
+    //----------------------------type end----------------------------//
 
+    //----------------------------cookie start----------------------------//
     //google浏览器禁用了本地网页的cookie操作，只能通过在线方式操作本地的cookie
     //添加cookie:
     // expiresSecond表示cookie有效时间，单位是秒
@@ -188,6 +191,7 @@
         date.setTime(date.getTime() - 10000); //将时间设置为过去时
         document.cookie = name + "=v; expires=" + date.toGMTString();
     }
+    //----------------------------cookie end----------------------------//
 
     //----------------------------ajax start----------------------------//
     gecko.ajax = function (conf) {
@@ -226,7 +230,6 @@
                 alert('服务器响应异常') && error();
             }
         }
-
         function convertData(data) {
             if (typeof data === 'object') {
                 var convertResult = "";
@@ -241,6 +244,37 @@
         }
     }
     //----------------------------ajax end----------------------------//
+
+    //----------------------------throttle start----------------------------//
+    //函数节流：解决window.onresize、mousemove、scroll滚动事件、上传进度等，操作频繁导致性能消耗过高问题
+    gecko.throttle = function (fn, interval) {
+        var _self = fn,   //保存需要被延迟执行的函数引用
+            timer,  //定时器
+            firstTime = true; //是否是第一次调用
+        return function () {
+            var args = arguments,
+                _me = this;
+            if (firstTime) {  //如果是第一次调用，，则不需要延迟执行
+                _self.apply(_me, args);
+                return firstTime = false;
+            }
+            if (timer) {  //如果定时器还在，说明前一次延迟执行还没有完成
+                return false;
+            }
+            timer = setTimeout(function () {    //默认延迟500ms执行
+                clearTimeout(timer);
+                timer = null;
+                _self.apply(_me, args);
+            }, interval || 500);
+        }
+    }
+    /*
+    应用实例：
+    window.onresize = throttle(function () {
+        console.log(1);
+    }, 500);
+    */
+    //----------------------------throttle end----------------------------//
 
     /***************定义类方法end*******************/
 
@@ -329,7 +363,7 @@
         return attrHook[arguments.length]();
     }
 
-    
+
     /* 事件开始 */
     //只实现on的常用功能:事件委托
     //并非所有的事件都能冒泡，如load, change, submit, focus, blur
@@ -356,7 +390,7 @@
                     let that = getNode(e.target)
                     if (that) { //因为如果点到thisName的祖宗节点上，that将为Null，操作没有节点属性的null将在控制台报错
                         handler.call(that, e) //将handler里的this指向点击的那个node
-                    } else { 
+                    } else {
                         return false;
                     }
                 }
@@ -366,7 +400,7 @@
     }
     /* 事件结束 */
 
-        /* 动画开始 */
+    /* 动画开始 */
     /*gecko.prototype.animate = function animate(obj, css, interval, speedFactor, func) {
         clearInterval(obj.timer);
 
