@@ -246,7 +246,8 @@
     //----------------------------ajax end----------------------------//
 
     //----------------------------throttle start----------------------------//
-    //函数节流：解决window.onresize、mousemove、scroll滚动事件、上传进度等，操作频繁导致性能消耗过高问题
+    //函数节流：解决window.onresize、mousemove、keypress、连续click、scroll滚动事件、上传进度等，操作频繁导致性能消耗过高问题
+    //原理：当连续触发事件时，节流函数会先判断之前的延时是否执行完，没有的话不会将新的事件压入任务队列中
     gecko.throttle = function (fn, interval) {
         var _self = fn,   //保存需要被延迟执行的函数引用
             timer,  //定时器
@@ -261,11 +262,11 @@
             if (timer) {  //如果定时器还在，说明前一次延迟执行还没有完成
                 return false;
             }
-            timer = setTimeout(function () {    //默认延迟500ms执行
+            timer = setTimeout(function () {
                 clearTimeout(timer);
                 timer = null;
                 _self.apply(_me, args);
-            }, interval || 500);
+            }, interval || 500);    //默认延迟500ms执行
         }
     }
     /*
@@ -275,6 +276,50 @@
     }, 500);
     */
     //----------------------------throttle end----------------------------//
+
+    //----------------------------debounce start----------------------------//
+    //函数防抖：例如搜索框匹配keypress事件时，连续输入将多次触发搜索，显然没必要
+    //原理：就是让某个函数在上一次执行后，满足等待某个时间内不再触发此函数后再执行，而在这个等待时间内再次触发此函数，等待时间会重新计算。
+    //参数function是需要进行函数防抖的函数；参数wait则是需要等待的时间，单位为毫秒；
+    //immediate参数如果为true，则debounce函数会在调用时立刻执行一次function，不需要等到wait这个时间后。而为false时，需等时间完后才执行一次。
+    gecko.debounce = function (func, wait, immediate) {
+        var timeout, args, context, timestamp, result;
+        var later = function () {
+            var last = new Date().getTime() - timestamp;
+            if (last < wait && last >= 0) { //最后一次点击与倒数第二次的时间差与设定的时差比较
+                timeout = setTimeout(later, wait - last);
+            } else {
+                timeout = null; //如果>设定时差则将timeout定为false
+                if (!immediate) {
+                    result = func.apply(context, args);
+                    if (!timeout) {
+                        context = args = null;
+                    }
+                }
+            }
+        };
+        return function () {
+            context = this;
+            args = arguments;
+            timestamp = new Date().getTime();   //timestamp更新为最新点击的时间
+            var callNow = immediate && !timeout;    //timeout有两种情况为false:第一次运行时和func再次调用超过了wait时间
+            if (!timeout) { //因为timeout在闭包中，第2、3次执行debounce时，timeout的状态会一直保存
+                timeout = setTimeout(later, wait);
+            }
+            if (callNow) {
+                result = func.apply(context, args);
+                context = args = null;
+            }
+            return result;
+        };
+    };
+    /*
+    应用实例：
+        document.getElementById('dianwo').onclick = gecko.debounce(function () {
+            console.log('hello world!') 
+        }, 1000, false)
+    */
+    //----------------------------debounce end----------------------------//
 
     /***************定义类方法end*******************/
 
