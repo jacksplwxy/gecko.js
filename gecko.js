@@ -320,24 +320,33 @@
         }, 1000, false)
     */
     //----------------------------debounce end----------------------------//
-	//----------------------------图片懒加载 end----------------------------//
-	gecko.imgLazyLoad = function () {
-        var imgs = document.querySelectorAll('img');
-        var H = window.innerHeight;	//浏览器视窗高度
-        var S = document.documentElement.scrollTop || document.body.scrollTop;	 //滚动条滚过高度
-        function getTop(e) {	//获取元素距离顶部高度方法。  
+    //----------------------------图片懒加载 end----------------------------//
+    gecko.imgLazyLoad = (function () {
+        var imgs = document.body.querySelectorAll('img[data-src]'),
+            H = window.innerHeight;  //浏览器视窗高度
+        function getTop(e) {	//图片距页面顶部距离
             var T = e.offsetTop;
             while (e = e.offsetParent) {
-                T += e.offsetParent;
+                T += e.offsetTop
             }
-            return T;
+            return T
         }
-        for (var i = 0; i < imgs.length; i++) {
-            if (H + S > getTop(imgs[i])) {
-                imgs[i].src = imgs[i].getAttribute('data-src');
-            }
+        return function () {
+            var S = document.documentElement.scrollTop || document.body.scrollTop;   //滚动条滚过高度
+            [].forEach.call(imgs, function (img) {
+                if (!img.getAttribute('data-src')) {
+                    return
+                }  //已经替换过的跳过
+                if (H + S > getTop(img)) {
+                    img.src = img.getAttribute("data-src");//将data-src中的数据赋值给src
+                    img.removeAttribute("data-src");
+                }
+            });
+            [].every.call(imgs, function (img) {
+                return !img.getAttribute('data-src')
+            }) && (window.removeEventListener("scroll", lazyload, false));   //完成所有替换后注销事件
         }
-    }
+    })()
 	/*
 	应用实例：
 		<img src="" data-src="1.jpg" alt="图片">
@@ -346,9 +355,9 @@
 		}
 		window.onscroll = gecko.throttle(function () {  //利用函数节流优化性能
 			gecko.imgLazyLoad();
-		}, 300)
+		}, 100)
 	*/
-	//----------------------------图片懒加载 end----------------------------//
+    //----------------------------图片懒加载 end----------------------------//
 
     /***************定义类方法end*******************/
 
