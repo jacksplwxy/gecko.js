@@ -320,6 +320,35 @@
         }, 1000, false)
     */
     //----------------------------debounce end----------------------------//
+	//----------------------------图片懒加载 end----------------------------//
+	gecko.imgLazyLoad = function () {
+        var imgs = document.querySelectorAll('img');
+        var H = window.innerHeight;	//浏览器视窗高度
+        var S = document.documentElement.scrollTop || document.body.scrollTop;	 //滚动条滚过高度
+        function getTop(e) {	//获取元素距离顶部高度方法。  
+            var T = e.offsetTop;
+            while (e = e.offsetParent) {
+                T += e.offsetParent;
+            }
+            return T;
+        }
+        for (var i = 0; i < imgs.length; i++) {
+            if (H + S > getTop(imgs[i])) {
+                imgs[i].src = imgs[i].getAttribute('data-src');
+            }
+        }
+    }
+	/*
+	应用实例：
+		<img src="" data-src="1.jpg" alt="图片">
+		window.onload = function () {   //DOM加载好后，在第一屏的图片进行加载
+			gecko.imgLazyLoad();
+		}
+		window.onscroll = gecko.throttle(function () {  //利用函数节流优化性能
+			gecko.imgLazyLoad();
+		}, 300)
+	*/
+	//----------------------------图片懒加载 end----------------------------//
 
     /***************定义类方法end*******************/
 
