@@ -344,18 +344,16 @@
             });
             [].every.call(imgs, function (img) {
                 return !img.getAttribute('data-src')
-            }) && (window.removeEventListener("scroll", lazyload, false));   //完成所有替换后注销事件
+            }) && (window.removeEventListener("scroll", gecko.imgLazyLoad, false));   //完成所有替换后注销事件
         }
     })()
 	/*
 	应用实例：
 		<img src="" data-src="1.jpg" alt="图片">
-		window.onload = function () {   //DOM加载好后，在第一屏的图片进行加载
-			gecko.imgLazyLoad();
-		}
-		window.onscroll = gecko.throttle(function () {  //利用函数节流优化性能
-			gecko.imgLazyLoad();
-		}, 100)
+		window.addEventListener("load", gecko.imgLazyLoad, false); //DOM加载好后，在第一屏的图片进行加载
+                window.addEventListener("scroll", gecko.throttle(function () { //利用函数节流优化性能
+                    gecko.imgLazyLoad();
+                }, 100), false);
 	*/
     //----------------------------图片懒加载 end----------------------------//
 
