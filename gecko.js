@@ -324,10 +324,10 @@
     gecko.imgLazyLoad = (function () {
         var imgs = document.body.querySelectorAll('img[data-src]'),
             H = window.innerHeight;  //浏览器视窗高度
-        function getTop(e) {	//图片距页面顶部距离
-            var T = e.offsetTop;
-            while (e = e.offsetParent) {
-                T += e.offsetTop
+        function getTop(e) {	//图片距页面顶部距离（https://segmentfault.com/a/1190000002879406）
+            var T = e.offsetTop;  //所有HTML元素拥有offsetLeft和offsetTop属性来返回元素的X和Y坐标
+            while (e = e.offsetParent) {  //相对于已定位元素的后代元素和一些其他元素（表格单元），这些属性返回的坐标是相对于祖先元素。一般元素，则是相对于文档，返回的是文档坐标
+                T += e.offsetTop	//叠加父容器的上边距，offsetParent与定位有关定位父级offsetParent的定义是：与当前元素最近的经过定位(position不等于static)的父级元素
             }
             return T
         }
