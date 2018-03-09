@@ -131,7 +131,7 @@
     /***************定义内部方法end*******************/
 
     /***************定义类方法start*******************/
-    gecko.each = each;  //暴露each
+    gecko.each = each; //暴露each
 
     //----------------------------type start----------------------------//
     //类方法：tyope函数:用于定义对象的精确类型
@@ -230,6 +230,7 @@
                 alert('服务器响应异常') && error();
             }
         }
+
         function convertData(data) {
             if (typeof data === 'object') {
                 var convertResult = "";
@@ -245,28 +246,65 @@
     }
     //----------------------------ajax end----------------------------//
 
+    //----------------------------getUrlPara start----------------------------//
+    //获取当前页面url的指定参数的值
+    gecko.getUrlpara = function (key) {
+        var reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+        var r = window.location.search.substr(1).match(reg); //window.location.search：获取url的？及之后字符串，substr(1)：除去？之后的字符串
+        if (r != null) {
+            return unescape(r[2]); //中文解码
+        }
+        return null; //返回参数值
+    }
+    /**
+     * 使用：假如当前页面url为：https://www.baidu.com?a=aaa&b=bbb
+     * console.log( gecko.getUrlpara(b))  //bbb
+     */
+    //----------------------------getUrlPara end----------------------------//
+
+    //----------------------------getUrlPara start----------------------------//
+    //获得指定url的所有参数数据，以数组包含对象的形状返回回来
+    gecko.parseUrl = function (url) {
+        var result = [];
+        var query = url.split("?")[1];
+        var queryArr = query.split("&");
+        queryArr.forEach(function (item) {
+            var obj = {};
+            var value = item.split("=")[0];
+            var key = item.split("=")[1];
+            obj[key] = value;
+            result.push(obj);
+        });
+        return result;
+    }
+    /**
+     * 例如：var url = 'www.u.com/home?id=2&type=0&dtype=-1';
+     * console.log(gecko.parseUrl(url));  //[{id: '2'},{type: '0'},{dtype: '-1'}]
+     */
+    //----------------------------getUrlPara end----------------------------//    
+
     //----------------------------throttle start----------------------------//
     //函数节流：解决window.onresize、mousemove、keypress、连续click、scroll滚动事件、上传进度等，操作频繁导致性能消耗过高问题
     //原理：当连续触发事件时，节流函数会先判断之前的延时是否执行完，没有的话不会将新的事件压入任务队列中
     gecko.throttle = function (fn, interval) {
-        var _self = fn,   //保存需要被延迟执行的函数引用
-            timer,  //定时器
+        var _self = fn, //保存需要被延迟执行的函数引用
+            timer, //定时器
             firstTime = true; //是否是第一次调用
         return function () {
             var args = arguments,
                 _me = this;
-            if (firstTime) {  //如果是第一次调用，，则不需要延迟执行
+            if (firstTime) { //如果是第一次调用，，则不需要延迟执行
                 _self.apply(_me, args);
                 return firstTime = false;
             }
-            if (timer) {  //如果定时器还在，说明前一次延迟执行还没有完成
+            if (timer) { //如果定时器还在，说明前一次延迟执行还没有完成
                 return false;
             }
             timer = setTimeout(function () {
                 clearTimeout(timer);
                 timer = null;
                 _self.apply(_me, args);
-            }, interval || 500);    //默认延迟500ms执行
+            }, interval || 500); //默认延迟500ms执行
         }
     }
     /*
@@ -301,8 +339,8 @@
         return function () {
             context = this;
             args = arguments;
-            timestamp = new Date().getTime();   //timestamp更新为最新点击的时间
-            var callNow = immediate && !timeout;    //timeout有两种情况为false:第一次运行时和func再次调用超过了wait时间
+            timestamp = new Date().getTime(); //timestamp更新为最新点击的时间
+            var callNow = immediate && !timeout; //timeout有两种情况为false:第一次运行时和func再次调用超过了wait时间
             if (!timeout) { //因为timeout在闭包中，第2、3次执行debounce时，timeout的状态会一直保存
                 timeout = setTimeout(later, wait);
             }
@@ -323,31 +361,31 @@
     //----------------------------图片懒加载 end----------------------------//
     gecko.imgLazyLoad = (function () {
         var imgs = document.body.querySelectorAll('img[data-src]'),
-            H = window.innerHeight;  //浏览器视窗高度
-        function getTop(e) {	//图片距页面顶部距离（https://segmentfault.com/a/1190000002879406）
-            var T = e.offsetTop;  //所有HTML元素拥有offsetLeft和offsetTop属性来返回元素的X和Y坐标
-            while (e = e.offsetParent) {  //相对于已定位元素的后代元素和一些其他元素（表格单元），这些属性返回的坐标是相对于祖先元素。而一般元素，则是相对于文档，返回的是文档坐标
-                T += e.offsetTop	//叠加父容器的上边距，offsetParent与定位有关定位父级offsetParent的定义是：与当前元素最近的经过定位(position不等于static)的父级元素
+            H = window.innerHeight; //浏览器视窗高度
+        function getTop(e) { //图片距页面顶部距离（https://segmentfault.com/a/1190000002879406）
+            var T = e.offsetTop; //所有HTML元素拥有offsetLeft和offsetTop属性来返回元素的X和Y坐标
+            while (e = e.offsetParent) { //相对于已定位元素的后代元素和一些其他元素（表格单元），这些属性返回的坐标是相对于祖先元素。而一般元素，则是相对于文档，返回的是文档坐标
+                T += e.offsetTop //叠加父容器的上边距，offsetParent与定位有关定位父级offsetParent的定义是：与当前元素最近的经过定位(position不等于static)的父级元素
             }
             return T
         }
         return function () {
-            var S = document.documentElement.scrollTop || document.body.scrollTop;   //滚动条滚过高度
+            var S = document.documentElement.scrollTop || document.body.scrollTop; //滚动条滚过高度
             [].forEach.call(imgs, function (img) {
                 if (!img.getAttribute('data-src')) {
                     return
-                }  //已经替换过的跳过
+                } //已经替换过的跳过
                 if (H + S > getTop(img)) {
-                    img.src = img.getAttribute("data-src");//将data-src中的数据赋值给src
+                    img.src = img.getAttribute("data-src"); //将data-src中的数据赋值给src
                     img.removeAttribute("data-src");
                 }
             });
             [].every.call(imgs, function (img) {
                 return !img.getAttribute('data-src')
-            }) && (window.removeEventListener("scroll", gecko.imgLazyLoad, false));   //完成所有替换后注销事件
+            }) && (window.removeEventListener("scroll", gecko.imgLazyLoad, false)); //完成所有替换后注销事件
         }
     })()
-	/*
+    /*
 	应用实例：
 		<img src="" data-src="1.jpg" alt="图片">
 		window.addEventListener("load", gecko.imgLazyLoad, false); //DOM加载好后，在第一屏的图片进行加载
